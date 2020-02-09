@@ -3,7 +3,7 @@ def compare_by_util(x, y):
 
 
 def compare_by_dis(x, y):
-    return x.dis - y.dis
+    return x.dist - y.dist
 
 
 def compare_by_lag(x, y):

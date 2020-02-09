@@ -1,10 +1,18 @@
 from functools import cmp_to_key
 from comparator import *
 from input_util import *
+from task import *
 
 
 def is_exist(queue, task):
     return any(task == existed_task for existed_task in queue)
+
+
+def is_exist_delete(queue, task):
+    for i, existed_task in enumerate(queue):
+        if existed_task == task:
+            queue.pop(i)
+            return
 
 
 def run():
@@ -23,9 +31,11 @@ def run():
                 if task.is_urgent():
                     if not is_exist(queue_u, task):
                         queue_u.append(task)
+                    # is_exist_delete(queue_nu, task)
                 else:
                     if not is_exist(queue_nu, task):
                         queue_nu.append(task)
+                    # is_exist_delete(queue_u, task)
 
                 U = 0
                 for a_task in queue_a:
@@ -42,7 +52,8 @@ def run():
                         queue_a.append(task)
                     else:
                         queue_u.append(task)
-                        print("{}에 task{}에 대해서 Dynamic Failure 발생".format(cur_time + 1, queue_u[i].num))
+                        if task.histories[(task.end + 1) % task.k] != DEFAULT:
+                            print("{}에 task{}에 대해서 Dynamic Failure 발생".format(cur_time + 1, queue_u[i].num))
 
                 for i in range(len(queue_nu)):
                     task = queue_nu.pop(0)
