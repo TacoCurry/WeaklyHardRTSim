@@ -1,5 +1,9 @@
-# 데드라인 충족 여부
-DEFAULT, m, M = range(3)
+"""
+Deadline
+M = meet = 1 = True
+m = miss = 0 = False
+"""
+deadline_dict = {True: 1, False: 0}
 
 
 class Task:
@@ -12,38 +16,22 @@ class Task:
 
         self.util = C / P
         self.dist = 1
-        self.lag = self.S = self.start_time = 0
-
-        '''
-        dynamic failure 판단을 위해 과거 k개 job의 데드라인 충족 여부를 histories에 유지.
-        circular queue를 사용.
-        '''
-        self.histories = [DEFAULT for i in range(k)]
-        self.end = DEFAULT
+        self.lag = self.start_time = 0
+        self.S = C
+        self.histories = [1 for _ in range(k-1)]
 
     def update_dist(self, is_meet_deadline):
         # Update histories and count
-        self.end = (self.end + 1) % self.k
-        if is_meet_deadline:
-            self.histories[self.end] = M
-        else:
-            self.histories[self.end] = m
+        self.histories.append(deadline_dict[is_meet_deadline])
 
         # Calculate and update dist
-        count_M = 0
-        for state in self.histories:
-            if state == M:
-                count_M += 1
-
-        start = (self.end + 1) % self.k
-        dist = 1
-        for i in range(self.k):
-            if self.histories[start] == M:
-                count_M -= 1
-            if count_M < m:
-                break
-            start = (start + 1) % self.k
+        count_meet = sum(self.histories[-self.k:])
+        dist = 0
+        for start in range(-self.k, 0):
+            count_meet -= self.histories[start]
             dist += 1
+            if count_meet < self.m:
+                break
         self.dist = dist
 
     def is_urgent(self):
@@ -64,3 +52,7 @@ class Task:
 
     def is_deadline_meet(self):
         return self.S >= self.C
+
+    def __str__(self):
+        return "Task{}(C={}, P={}, m={}, k={})"\
+            .format(self.num, self.C, self.P, self.m, self.k)
